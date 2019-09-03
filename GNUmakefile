@@ -55,7 +55,7 @@ docker-start: ## Run the docker image with some sane defaults
 	@echo " "
 	$(DOCKER_BIN) run --name $(CNAME) \
 		--rm -d \
-    -p 8080:8080 \
+		-p 127.0.0.1:8080:80 \
 	  $(DOCKER_IMAGE)
 
 .PHONY: docker-stop

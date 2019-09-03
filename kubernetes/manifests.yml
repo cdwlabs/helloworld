@@ -78,15 +78,16 @@ spec:
         livenessProbe:
           initialDelaySeconds: 10
           periodSeconds: 3
-          tcpSocket:
-            port: 8080
+          httpGet:
+            path: /healthz
+            port: 80
         name: helloworld-api
         ports:
         - containerPort: 8080
         readinessProbe:
           httpGet:
             path: /healthz
-            port: 8080
+            port: 80
           initialDelaySeconds: 20
           periodSeconds: 15
           timeoutSeconds: 5
