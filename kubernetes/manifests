@@ -1,0 +1,95 @@
+---
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app: demo
+    component: helloworld-api
+  name: dev-helloworld-api
+  namespace: default
+spec:
+  ports:
+  - name: http
+    port: 8080
+    targetPort: 8080
+  selector:
+    app: demo
+    component: helloworld-api
+  type: ClusterIP
+---
+apiVersion: apps/v1beta2
+kind: Deployment
+metadata:
+  labels:
+    app: demo
+    component: helloworld-api
+  name: dev-helloworld-api
+  namespace: default
+spec:
+  progressDeadlineSeconds: 600
+  replicas: 2
+  selector:
+    matchLabels:
+      app: demo
+      component: helloworld-api
+  strategy:
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 0
+    type: RollingUpdate
+  template:
+    metadata:
+      labels:
+        app: demo
+        component: helloworld-api
+    spec:
+      affinity:
+        podAntiAffinity:
+          preferredDuringSchedulingIgnoredDuringExecution:
+          - podAffinityTerm:
+              labelSelector:
+                matchExpressions:
+                - key: app
+                  operator: In
+                  values:
+                  - demo
+                - key: component
+                  operator: In
+                  values:
+                  - helloworld-api
+              topologyKey: kubernetes.io/hostname
+            weight: 1
+          - podAffinityTerm:
+              labelSelector:
+                matchExpressions:
+                - key: app
+                  operator: In
+                  values:
+                  - demo
+                - key: component
+                  operator: In
+                  values:
+                  - helloworld-api
+              topologyKey: failure-domain.beta.kubernetes.io/region
+            weight: 2
+      containers:
+      - image: cdwlabs-docker-local.jfrog.io/helloworld:0.0.3
+        imagePullPolicy: IfNotPresent
+        livenessProbe:
+          initialDelaySeconds: 10
+          periodSeconds: 3
+          tcpSocket:
+            port: 8080
+        name: helloworld-api
+        ports:
+        - containerPort: 8080
+        readinessProbe:
+          httpGet:
+            path: /healthz
+            port: 8080
+          initialDelaySeconds: 20
+          periodSeconds: 15
+          timeoutSeconds: 5
+        resources:
+          limits:
+            memory: 100M
