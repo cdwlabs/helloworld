@@ -73,7 +73,7 @@ spec:
               topologyKey: failure-domain.beta.kubernetes.io/region
             weight: 2
       containers:
-      - image: cdwlabs-docker-local.jfrog.io/helloworld:0.0.3
+      - image: cdwlabs-docker-local.jfrog.io/helloworld:0.0.4
         imagePullPolicy: IfNotPresent
         livenessProbe:
           initialDelaySeconds: 10
